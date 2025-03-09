@@ -442,8 +442,61 @@ const data = [
     }
 ];
 
+const tableBody = document.getElementById("player-rows");
+const searchInput = document.getElementById("search");
+const teamFilter = document.getElementById("team-filter");
+const darkModeToggle = document.getElementById("dark-mode-toggle");
+const tableHeaders = document.querySelectorAll("th");
+
+function populateTable(filteredPlayers) {
+    tableBody.innerHTML = "";
+    filteredPlayers.forEach(player => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${player.name}</td>
+            <td>${player.team}</td>
+            <td>${player.points}</td>
+            <td>${player.rebounds}</td>
+            <td>${player.assists}</td>
+            <td>${player.blocks}</td>
+            <td>${player.turnovers}</td>`;
+        tableBody.appendChild(row);
+    });
+}
+
+function populateTeamFilter() {
+    const teams = [...new Set(data.map(player => player.team))];
+    teams.forEach(team => {
+        const option = document.createElement("option");
+        option.value = team;
+        option.textContent = team;
+        teamFilter.appendChild(option);
+    });
+}
+
+searchInput.addEventListener("input", () => {
+    filterPlayers();
+});
 
 
+teamFilter.addEventListener("change", () => {
+    filterPlayers();
+});
 
+function filterPlayers() {
+    const searchText = searchInput.value.toLowerCase();
+    const selectedTeam = teamFilter.value;
+    const filteredPlayers = data.filter(player => {
+        const matchesSearch = player.name.toLowerCase().includes(searchText);
+        const matchesTeam = selectedTeam === "all" || player.team === selectedTeam;
+        return matchesSearch && matchesTeam;
+    });
+    populateTable(filteredPlayers);
+}
 
+darkModeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+});
 
+populateTable(data);
+populateTeamFilter();
